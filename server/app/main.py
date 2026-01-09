@@ -1,5 +1,6 @@
 ﻿from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
+from app.features.get_buildings import router as buildings_router
 
 app = FastAPI()
 
@@ -19,6 +20,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(buildings_router, prefix="/buildings")
 
 
 @app.get("/health")
