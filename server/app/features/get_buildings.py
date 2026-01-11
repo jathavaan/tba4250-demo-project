@@ -19,7 +19,11 @@ def get_buildings(session: Session = Depends(get_session)):
 
 
 def get_all_buildings(session: Session) -> list[Building]:
-    result = session.exec(select(Building)).all()
+    minx, miny, maxx, maxy = 5.2, 60.3, 5.5, 60.5
+    from sqlalchemy import func
+    envelope = func.ST_MakeEnvelope(minx, miny, maxx, maxy, 4326)
+    stmt = select(Building).where(func.ST_Intersects(Building.geom, envelope))
+    result = session.exec(stmt).all()
     return list(result)
 
 
@@ -27,8 +31,8 @@ def convert_buildings_to_geojson(buildings: list[Building]) -> dict[str, Any]:
     features: list[dict[str, Any]] = []
 
     for building in buildings:
-        # GeoAlchemy2 stores geometry as WKBElement
-        shapely_geom = wkb.loads(building.geom.data)
+        data = building.geom.data
+        shapely_geom = wkb.loads(bytes(data))
         geometry = mapping(shapely_geom)
 
         feature = {
