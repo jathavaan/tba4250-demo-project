@@ -1,8 +1,9 @@
 ﻿services:
   client:
-    build: ./client
-    env_file:
-      - client/.env
+    build:
+      context: ./client
+      args:
+        VITE_BACKEND_BASE_URL: http://localhost:5000
     ports:
       - "80:80"
     depends_on:
