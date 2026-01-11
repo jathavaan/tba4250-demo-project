@@ -3,6 +3,7 @@
 from fastapi import APIRouter, Depends
 from shapely import wkb
 from shapely.geometry import mapping
+from sqlalchemy import func
 from sqlmodel import Session, select
 
 from app.common.deps import get_session
@@ -19,8 +20,7 @@ def get_buildings(session: Session = Depends(get_session)):
 
 
 def get_all_buildings(session: Session) -> list[Building]:
-    minx, miny, maxx, maxy = 5.2, 60.3, 5.5, 60.5
-    from sqlalchemy import func
+    minx, miny, maxx, maxy = 5.31318, 60.38609, 5.33136, 60.39507
     envelope = func.ST_MakeEnvelope(minx, miny, maxx, maxy, 4326)
     stmt = select(Building).where(func.ST_Intersects(Building.geom, envelope))
     result = session.exec(stmt).all()
